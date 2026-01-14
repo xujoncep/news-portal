@@ -1,0 +1,44 @@
+using System.Linq.Expressions;
+using NewsPortal.Core.Entities;
+
+namespace NewsPortal.Core.Interfaces;
+
+public interface IRepository<T> where T : BaseEntity
+{
+    Task<T?> GetByIdAsync(int id);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+    Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+    Task<T> AddAsync(T entity);
+    Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities);
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(T entity);
+    Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
+    Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
+}
+
+public interface INewsArticleRepository : IRepository<NewsArticle>
+{
+    Task<NewsArticle?> GetBySlugAsync(string slug);
+    Task<IEnumerable<NewsArticle>> GetLatestAsync(int count);
+    Task<IEnumerable<NewsArticle>> GetByCategoryAsync(int categoryId, int page, int pageSize);
+    Task<IEnumerable<NewsArticle>> GetBySourceAsync(int sourceId, int page, int pageSize);
+    Task<IEnumerable<NewsArticle>> GetFeaturedAsync(int count);
+    Task<IEnumerable<NewsArticle>> SearchAsync(string query, int page, int pageSize);
+    Task IncrementViewCountAsync(int id);
+    Task<bool> ExistsBySourceUrlAsync(string sourceUrl);
+}
+
+public interface ICategoryRepository : IRepository<Category>
+{
+    Task<Category?> GetBySlugAsync(string slug);
+    Task<IEnumerable<Category>> GetActiveWithCountsAsync();
+}
+
+public interface INewsSourceRepository : IRepository<NewsSource>
+{
+    Task<NewsSource?> GetBySlugAsync(string slug);
+    Task<IEnumerable<NewsSource>> GetActiveSourcesAsync();
+    Task<NewsSource?> GetWithScrapingConfigAsync(int id);
+    Task UpdateLastFetchedAsync(int id);
+}
